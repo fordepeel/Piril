@@ -1,0 +1,65 @@
+name: Build Pırıl v1.1.0 APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Piril-Android-v1.1.0.zip'
+      - '.github/workflows/build-piril-v1.1.0.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          # The default ("tools platform-tools") fails on newer cmdline-tools,
+          # which no longer ship the legacy "tools" package. Required packages
+          # are installed explicitly in the next step.
+          packages: ''
+
+      - name: Install Android SDK 35
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract Pırıl source
+        run: |
+          rm -rf piril-src
+          mkdir piril-src
+          unzip -q Piril-Android-v1.1.0.zip -d piril-src
+
+      - name: Build APK
+        run: |
+          cd piril-src
+          gradle --no-daemon :app:assembleDebug --stacktrace
+
+      - name: Prepare APK
+        run: |
+          cp piril-src/app/build/outputs/apk/debug/app-debug.apk Piril-v1.1.0.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Piril-v1.1.0-APK
+          path: Piril-v1.1.0.apk
+          if-no-files-found: error
