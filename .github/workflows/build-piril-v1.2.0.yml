@@ -1,11 +1,11 @@
-name: Build Pırıl v1.1.0 APK
+name: Build Pırıl v1.2.0 APK
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - 'Piril-Android-v1.1.0.zip'
-      - '.github/workflows/build-piril-v1.1.0.yml'
+      - 'Piril-Android-v1.2.0.zip'
+      - '.github/workflows/build-piril-v1.2.0.yml'
 
 permissions:
   contents: read
@@ -46,7 +46,7 @@ jobs:
         run: |
           rm -rf piril-src
           mkdir piril-src
-          unzip -q Piril-Android-v1.1.0.zip -d piril-src
+          unzip -q Piril-Android-v1.2.0.zip -d piril-src
 
       - name: Build APK
         run: |
@@ -55,11 +55,11 @@ jobs:
 
       - name: Prepare APK
         run: |
-          cp piril-src/app/build/outputs/apk/debug/app-debug.apk Piril-v1.1.0.apk
+          cp piril-src/app/build/outputs/apk/debug/app-debug.apk Piril-v1.2.0.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Piril-v1.1.0-APK
-          path: Piril-v1.1.0.apk
+          name: Piril-v1.2.0-APK
+          path: Piril-v1.2.0.apk
           if-no-files-found: error
